@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>En grej</title>
+  <style>
+    html {
+      background-color: rgba(10,10,10,1);
+      height: 100%;
+    }
+    html, body {
+      margin: 0px;
+      padding: 0px;
+    }
+    .flex-container {
+      display: flex;
+      justify-content: space-around;
+      min-height: 400px;
+    }
+    .flex-item {
+      color: white;
+      font-family: Helvetica;
+      font-size: 40px;
+      width: 100%;
+      padding-top: 200px;
+      text-align: center;
+      background-position: center;
+      background-blend-mode: multiply;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+    .flex-item:nth-of-type(1) {
+        background-image: url("media/jagater.jpeg");
+        background-size: cover;
+        background-color: red;
+    }
+    .flex-item:nth-of-type(2) {
+        background-image: url("media/bajs.jpeg");
+        background-size: cover;
+        background-color: blue;
+    }
+    .flex-item:nth-of-type(3) {
+        background-image: url("media/urandras.jpeg");
+        background-position: left;
+        background-color: green;
+    }
+    .flex-item:nth-of-type(4) {
+        background-image: url("media/rovar.jpeg");
+        
+        background-color: yellow;
+    }
+    span {
+      font-size: 24px;
+      color: darkgrey;
+      display: block;
+    }
+    .playing {
+      background-color: white;
+    }
+    select {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    </style>
+</head>
+<body>
+
+  <div class="flex-container">
+    <div data-key="65" class="flex-item">JAG ÄTER<span>(A)</span></div>
+    <div data-key="83" class="flex-item">BAJS<span>(S)</span></div>
+    <div data-key="68" class="flex-item">UR ANDRAS<span>(D)</span></div>
+    <div data-key="70" class="flex-item">RÖVAR<span>(F)</span></div>
+  </div>
+
+  <audio data-key="65" src="media/jagater.mp3"></audio>
+  <audio data-key="83" src="media/bajs.mp3"></audio>
+  <audio data-key="68" src="media/urandras.mp3"></audio>
+  <audio data-key="70" src="media/rovar.mp3"></audio>
+  <audio data-key="49" src="media/guile.mp3"></audio>
+  <audio data-key="50" src="media/chiptune.mp3"></audio>
+  <audio data-key="51" src="media/bossanova.mp3"></audio>
+
+  <select id="music-selector">
+      <option value="48">None (0)</option>
+      <option value="49">Guile (1)</option>
+      <option value="50">Chiptune (2)</option>
+      <option value="51">Bossanova (3)</option>
+  </select>
+
+<script>
+  function playSound(e) {
+    let audio;
+    let k;
+    let stopMusic = false;
+    if (e.type === 'click') {
+      k = e.target.attributes['data-key'].value;
+      audio = document.querySelector(`audio[data-key="${e.target.attributes['data-key'].value}"]`);
+      key = document.querySelector(`.flex-item[data-key="${e.target.attributes['data-key'].value}"]`);
+    } else if (e.type === 'change') {
+      k = e.target.value = parseInt(e.target.value);
+      audio = document.querySelector(`audio[data-key="${e.target.value}"]`);
+      key = document.querySelector(`.flex-item[data-key="${e.target.value}"]`);
+    } else if (e.type === 'keydown') {
+      audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+      key = document.querySelector(`.flex-item[data-key="${e.keyCode}"]`);
+      k = e.keyCode;
+    }
+    if (k === 49 || k === 50 || k === 51) {
+      document.getElementById('music-selector').value = ""+k;
+      stopAllSounds();
+      audio.volume = 0.6;
+    } else if (k === 48) {
+      document.getElementById('music-selector').value = ""+k;
+      stopAllSounds();
+      if (!audio) return;
+    } else {
+      if (!audio) return;
+      key.classList.add('playing');
+    }
+    audio.currentTime = 0; // rewind to the start
+    audio.play();
+  }
+
+  function stopAllSounds() {
+    var sounds = document.getElementsByTagName('audio');
+    for(i=0; i<sounds.length; i++) sounds[i].pause();
+  }
+
+  function removeTransition(e) {
+    if (e.propertyName !== 'transform') return; // skip if it's not a transform
+    this.classList.remove('playing');
+  }
+
+  const keys = document.querySelectorAll('.key');
+  keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+  window.addEventListener('keydown', playSound);
+  const el = document.querySelectorAll('.flex-item');
+  el.forEach(el => el.addEventListener('click', playSound));
+  const musicSelect = document.querySelector('#music-selector');
+  musicSelect.addEventListener('change', playSound);
+</script>
+
+</body>
+</html>
